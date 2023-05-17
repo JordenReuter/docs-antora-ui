@@ -1,0 +1,32 @@
+name: CI
+on: 
+  push: 
+    branches: [ main ]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3          
+      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
+        with:        
+          cache: 'npm'  
+      - name: Build antora-ui
+        run: |
+          npm install
+          gulp bundle
+      - uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.run_number }}
+          commit: ${{ github.sha }}
+          name: Release ${{ github.run_number }}
+          artifacts: "build/ui-bundle.zip"        
+          makeLatest: "latest"
+      - name: Trigger website update
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.CI_PAT }}
+          repository: onecx/docs
+          event-type: dispatch-build-website
