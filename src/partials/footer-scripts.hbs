@@ -3,3 +3,10 @@
 {{#if env.SITE_SEARCH_PROVIDER}}
 {{> search-scripts}}
 {{/if}}
+<script>
+    document.addEventListener('readystatechange', event => {
+    if (event.target.readyState === "complete") {
+        renderAllBpmnJs();
+    }
+    });    
+</script>
